@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des courses hors délais</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Analyse des courses hors délais</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <label for="file-input">Téléchargez votre fichier Excel :</label>
+        <input type="file" id="file-input" accept=".xlsx, .xls">
+        <button type="submit">Analyser</button>
+    </form>
+    <div id="result"></div>
+
+    <!-- Inclusion de la bibliothèque xlsx depuis un CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <!-- Inclusion de moment.js depuis un CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
