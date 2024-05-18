@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des courses hors délais</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Analyse des courses hors délais</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <label for="file-input">Téléchargez votre fichier Excel :</label>
+        <input type="file" id="file-input" accept=".xlsx, .xls">
+        <button type="submit">Analyser</button>
+    </form>
+    <div id="result"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="app.js"></script>
+
+    <script>
+        function downloadExcel(data) {
+            const worksheet = XLSX.utils.json_to_sheet(data);
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Courses en retard");
+
+            const excelBlob = workbook2blob(workbook);
+
+            saveAs(excelBlob, 'courses_en_retard.xlsx');
+        }
+
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = "<h2>Courses en retard :</h2>";
+
+            // Catégorisation des courses en retard
+            const coursesPlus15min = [];
+            const coursesEntre10et15min = [];
+            const coursesEntre1et10min = [];
+
+            data.forEach(row => {
+                const diffMinutes = row.diffMinutes;
+                if (diffMinutes > 15) {
+                    coursesPlus15min.push(row);
+                } else if (diffMinutes >= 10 && diffMinutes <= 15) {
+                    coursesEntre10et15min.push(row);
+                } else {
+                    coursesEntre1et10min.push(row);
+                }
+            });
+
+            // Ajout de la ligne "Courses avec plus de 15 minutes de retard"
+            if (coursesPlus15min.length > 0) {
+                resultDiv.innerHTML += "<h3>Courses avec plus de 15 minutes de retard :</h3>";
+                const plus15minTable = createTable(coursesPlus15min);
+                resultDiv.appendChild(plus15minTable);
+            }
+
+            // Ajout de la ligne "Courses avec entre 10 et 15 minutes de retard"
+            if (coursesEntre10et15min.length > 0) {
+                resultDiv.innerHTML += "<h3>Courses avec entre 10 et 15 minutes de retard :</h3>";
+                const entre10et15minTable = createTable(coursesEntre10et15min);
+                resultDiv.appendChild(entre10et15minTable);
+            }
+
+            // Ajout de la ligne "Courses avec entre 1 et 10 minutes de retard"
+            if (coursesEntre1et10min.length > 0) {
+                resultDiv.innerHTML += "<h3>Courses avec entre 1 et 10 minutes de retard :</h3>";
+                const entre1et10minTable = createTable(coursesEntre1et10min);
+                resultDiv.appendChild(entre1et10minTable);
+            }
+
+            // Ajout du bouton de téléchargement Excel
+            const downloadBtnExcel = document.createElement('button');
+            downloadBtnExcel.textContent = 'Télécharger Excel';
+            downloadBtnExcel.addEventListener('click', () => downloadExcel(data));
+            resultDiv.appendChild(downloadBtnExcel);
+        }
+
+        function createTable(data) {
+            const table = document.createElement('table');
+            table.innerHTML = "<tr><th>Client</th><th>Numéro de compte</th><th>Numéro d'ordre</th><th>Prestation</th><th>Tarif</th><th>Date/heure prévue de livraison</th><th>Dates réalisées de livraison</th><th>Différence de temps (minutes)</th></tr>";
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                const diffMinutes = row.diffMinutes;
+                let classToAdd = '';
+                if (diffMinutes < 10) {
+                    classToAdd = 'green-row';
+                } else if (diffMinutes >= 10 && diffMinutes <= 15) {
+                    classToAdd = 'orange-row';
+                } else {
+                    classToAdd = 'red-row';
+                }
+                tr.className = classToAdd;
+
+                Object.keys(row).forEach(key => {
+                    const td = document.createElement('td');
+                    td.textContent = row[key];
+                    tr.appendChild(td);
+                });
+
+                table.appendChild(tr);
+            });
+            return table;
+        }
+
+        function workbook2blob(workbook) {
+            const wopts = { bookType: 'xlsx', bookSST: false, type: 'array' };
+            const wbout = XLSX.write(workbook, wopts);
+
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+
+            return blob;
+        }
+
+        function saveAs(blob, fileName) {
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            link.href = url;
+            link.download = fileName || '';
+
+            const event = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+            });
+
+            link.dispatchEvent(event);
+
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 0);
+        }
+    </script>
+</body>
+</html>
