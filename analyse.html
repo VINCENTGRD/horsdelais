@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des courses hors délais</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Bienvenue, Admin</h1>
+    <div id="choice">
+        <button id="analyze-btn">Analyser un fichier</button>
+        <button id="create-user-btn">Créer un nouvel utilisateur</button>
+    </div>
+
+    <div id="analyze-section" style="display: none;">
+        <h1>Analyse des courses hors délais</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <label for="file-input">Téléchargez votre fichier Excel :</label>
+            <input type="file" id="file-input" accept=".xlsx, .xls">
+            <button type="submit">Analyser</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <div id="create-user-section" style="display: none;">
+        <h2>Créer un nouvel utilisateur</h2>
+        <form id="register-form">
+            <label for="reg-username">Nom d'utilisateur :</label>
+            <input type="text" id="reg-username" name="username" required>
+            <label for="reg-password">Mot de passe :</label>
+            <input type="password" id="reg-password" name="password" required>
+            <button type="submit">Créer un utilisateur</button>
+        </form>
+        <div id="register-success" style="color: green; display: none;">Utilisateur créé avec succès!</div>
+        <div id="register-error" style="color: red; display: none;">Erreur lors de la création de l'utilisateur.</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
+    <script src="app.js"></script>
+
+    <script>
+        function downloadExcel(data) {
+            // Séparer les courses en deux catégories
+            const coursesPlus15min = data.filter(row => row.diffMinutes > 15);
+            const coursesMoins15min = data.filter(row => row.diffMinutes <= 15);
+
+            // Trier les deux catégories en ordre décroissant
+            coursesPlus15min.sort((a, b) => b.diffMinutes - a.diffMinutes);
+            coursesMoins15min.sort((a, b) => b.diffMinutes - a.diffMinutes);
+
+            // Créer deux feuilles de calcul
+            const worksheetPlus15min = XLSX.utils.json_to_sheet(coursesPlus15min);
+            const worksheetMoins15min = XLSX.utils.json_to_sheet(coursesMoins15min);
+
+            // Créer un nouveau classeur
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheetPlus15min, "Plus de 15 min");
+            XLSX.utils.book_append_sheet(workbook, worksheetMoins15min, "Moins de 15 min");
+
+            // Convertir le classeur en blob et le sauvegarder
+            const excelBlob = workbook2blob(workbook);
+            saveAs(excelBlob, 'courses_en_retard.xlsx');
+        }
+
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = "<h2>Courses en retard :</h2>";
+
+            const coursesPlus15min = [];
+            const coursesMoins15min = [];
+
+            data.forEach(row => {
+                const diffMinutes = row.diffMinutes;
+                if (diffMinutes > 15) {
+                    coursesPlus15min.push(row);
+                } else {
+                    coursesMoins15min.push(row);
+                }
+            });
+
+            if (coursesPlus15min.length > 0) {
+                resultDiv.innerHTML += "<h3>Courses avec plus de 15 minutes de retard :</h3>";
+                const plus15minTable = createTable(coursesPlus15min);
+                resultDiv.appendChild(plus15minTable);
+            }
+
+            if (coursesMoins15min.length > 0) {
+                resultDiv.innerHTML += "<h3>Courses avec moins de 15 minutes de retard :</h3>";
+                const moins15minTable = createTable(coursesMoins15min);
+                resultDiv.appendChild(moins15minTable);
+            }
+
+            const downloadBtnExcel = document.createElement('button');
+            downloadBtnExcel.textContent = 'Télécharger Excel';
+            downloadBtnExcel.addEventListener('click', () => downloadExcel(data));
+            resultDiv.appendChild(downloadBtnExcel);
+        }
+
+        function createTable(data) {
+            const table = document.createElement('table');
+            table.innerHTML = "<tr><th>Client</th><th>Numéro de compte</th><th>Numéro d'ordre</th><th>Prestation</th><th>Tarif</th><th>Date/heure prévue de livraison</th><th>Dates réalisées de livraison</th><th>Différence de temps (minutes)</th></tr>";
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                const diffMinutes = row.diffMinutes;
+                let classToAdd = diffMinutes <= 15 ? 'green-row' : 'red-row';
+                tr.className = classToAdd;
+
+                Object.keys(row).forEach(key => {
+                    const td = document.createElement('td');
+                    td.textContent = row[key];
+                    tr.appendChild(td);
+                });
+
+                table.appendChild(tr);
+            });
+            return table;
+        }
+
+        function workbook2blob(workbook) {
+            const wopts = { bookType: 'xlsx', bookSST: false, type: 'array' };
+            const wbout = XLSX.write(workbook, wopts);
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            return blob;
+        }
+
+        function saveAs(blob, fileName) {
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = fileName || '';
+            const event = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+            });
+            link.dispatchEvent(event);
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 0);
+        }
+    </script>
+</body>
+</html>

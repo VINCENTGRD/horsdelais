@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Connexion</h1>
+    <form id="login-form" action="/login" method="post">
+        <label for="username">Nom d'utilisateur :</label>
+        <input type="text" id="username" name="username" required>
+        <label for="password">Mot de passe :</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Se connecter</button>
+    </form>
+
+    <!-- Formulaire de création d'utilisateur -->
+    <div id="admin-section" style="display: none;">
+        <h1>Créer un utilisateur</h1>
+        <form id="register-form" action="/register" method="post">
+            <label for="reg-username">Nom d'utilisateur :</label>
+            <input type="text" id="reg-username" name="username" required>
+            <label for="reg-password">Mot de passe :</label>
+            <input type="password" id="reg-password" name="password" required>
+            <button type="submit">Créer un utilisateur</button>
+        </form>
+    </div>
+
+    <div id="login-error" style="color: red; display: none;">Identifiants incorrects. Veuillez réessayer.</div>
+    <div id="register-success" style="color: green; display: none;">Utilisateur créé avec succès!</div>
+    <div id="register-error" style="color: red; display: none;">Erreur lors de la création de l'utilisateur.</div>
+
+    <script src="login.js"></script>
+</body>
+</html>

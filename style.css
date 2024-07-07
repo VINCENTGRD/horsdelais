@@ -1,0 +1,94 @@
+/* Global styles */
+body {
+    font-family: 'Georgia', serif;
+    background-color: #121212;
+    color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+h1 {
+    color: #d4af37;
+    margin-bottom: 20px;
+}
+
+form {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    color: #d4af37;
+}
+
+input[type="file"] {
+    margin-bottom: 20px;
+    color: #d4af37;
+}
+
+button {
+    background-color: #d4af37;
+    color: #121212;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #b8860b;
+}
+
+#result {
+    margin-top: 20px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #d4af37;
+    color: #121212;
+}
+
+td {
+    background-color: #2e2e2e;
+}
+
+tr:nth-child(even) td {
+    background-color: #3e3e3e;
+}
+
+.green-row {
+    background-color: lightgreen !important;
+}
+
+.orange-row {
+    background-color: orange !important;
+}
+
+.red-row {
+    background-color: tomato !important;
+}
