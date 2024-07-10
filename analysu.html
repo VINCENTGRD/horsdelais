@@ -7,11 +7,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Bienvenue, Admin</h1>
+    <h1>Bienvenue !</h1>
     <div id="choice">
         <button id="analyze-btn">Analyser un fichier</button>
-        <button id="create-user-btn">Créer un nouvel utilisateur</button>
-        <button id="manage-user-btn">Gérer les utilisateurs</button>
+        <button id="create-user-btn" style="display: none;">Créer un nouvel utilisateur</button>
+        <button id="manage-user-btn" style="display: none;">Gérer les utilisateurs</button>
     </div>
 
     <div id="analyze-section" style="display: none;">
@@ -22,24 +22,6 @@
             <button type="submit">Analyser</button>
         </form>
         <div id="result"></div>
-    </div>
-
-    <div id="create-user-section" style="display: none;">
-        <h2>Créer un nouvel utilisateur</h2>
-        <form id="register-form">
-            <label for="reg-username">Nom d'utilisateur :</label>
-            <input type="text" id="reg-username" name="username" required>
-            <label for="reg-password">Mot de passe :</label>
-            <input type="password" id="reg-password" name="password" required>
-            <button type="submit">Créer un utilisateur</button>
-        </form>
-        <div id="register-success" style="color: green; display: none;">Utilisateur créé avec succès!</div>
-        <div id="register-error" style="color: red; display: none;">Erreur lors de la création de l'utilisateur.</div>
-    </div>
-
-    <div id="manage-user-section" style="display: none;">
-        <h2>Gérer les utilisateurs</h2>
-        <div id="user-list"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.core.min.js"></script>
@@ -54,8 +36,10 @@
                 .then(data => {
                     if (data.role === 'admin') {
                         document.getElementById('analyze-section').style.display = 'block';
+                        document.getElementById('create-user-btn').style.display = 'block';
+                        document.getElementById('manage-user-btn').style.display = 'block';
                     } else {
-                        document.getElementById('create-user-section').style.display = 'block';
+                        document.getElementById('analyze-section').style.display = 'block';
                     }
                 })
                 .catch(error => {

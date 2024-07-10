@@ -98,6 +98,14 @@ function displayResult(data) {
         resultDiv.innerHTML += "<h3>Courses avec plus de 15 minutes de retard :</h3>";
         const plus15minTable = createTable(coursesPlus15min);
         resultDiv.appendChild(plus15minTable);
+
+        // Ajouter une ligne avec le total négociable
+        const totalNegociable = coursesPlus15min.reduce((sum, row) => sum + parseFloat(row.Tarif), 0);
+        const totalDiv = document.createElement('div');
+        totalDiv.style.textAlign = 'center';
+        totalDiv.style.fontSize = 'larger';
+        totalDiv.innerText = `Tarif négociable: ${totalNegociable.toFixed(2)}€`;
+        resultDiv.appendChild(totalDiv);
     }
 
     if (coursesMoins15min.length > 0) {

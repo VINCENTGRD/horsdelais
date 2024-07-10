@@ -92,3 +92,8 @@ tr:nth-child(even) td {
 .red-row {
     background-color: tomato !important;
 }
+.result-summary {
+    text-align: center;
+    font-size: 1.3em; /* Taille de police plus grande */
+    margin: 20px 0; /* Marge autour de l'élément */
+}
