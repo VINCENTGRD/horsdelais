@@ -5,19 +5,20 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;  // Utilisation d'une variable d'environnement pour le port
 
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// Database setup (dans cet exemple, SQLite en mémoire)
+// Database setup
 const db = new sqlite3.Database(':memory:');
 db.serialize(() => {
     db.run("CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT, role TEXT)");
-    console.log("Database created and 'users' table initialized");
+    console.log("Database created and table 'users' initialized");
 
+    // Insert admin user
     const username = 'admin';
     const password = '0410';
     const hashedPassword = bcrypt.hashSync(password, 8);
@@ -26,7 +27,7 @@ db.serialize(() => {
             console.error('Error inserting admin user:', err);
         } else {
             console.log("Admin user created successfully");
-        }
+        }    
     });
 });
 
@@ -75,14 +76,16 @@ app.post('/login', (req, res) => {
 
         if (user.role === 'admin') {
             console.log("Admin logged in successfully:", username);
-            res.redirect('/analyse.html'); // Redirection pour l'admin
+            // Redirection vers analyse.html après connexion réussie de l'admin
+            return res.redirect('/analyse.html');
         } else {
             console.log("User logged in successfully:", username);
-            res.redirect('/analysu.html'); // Redirection pour l'utilisateur
+            return res.redirect('/analysu.html');
         }
     });
 });
 
+// Route to get all users
 app.get('/users', (req, res) => {
     db.all("SELECT id, username, role FROM users", (err, rows) => {
         if (err) {
@@ -93,6 +96,7 @@ app.get('/users', (req, res) => {
     });
 });
 
+// Route to delete a user
 app.delete('/users/:id', (req, res) => {
     const userId = req.params.id;
 
